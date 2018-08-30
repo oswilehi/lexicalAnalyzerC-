@@ -81,7 +81,11 @@ public class Utilities {
                     break;
                 case ID:
                     System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "ID", false));
+                    String id = lexer.lexeme.split(",")[3];
+                    if (id.length() <= 31 )
+                        jTextArea1.append(Utilities.getVariables(lexer.lexeme, "ID", false));
+                    else
+                        listOfErrors.add("Error, el ID: " + id + " supera los 31 caracteres en la linea " + lexer.lexeme.split(",")[0]);
                     break;    
                 case SYMBOLS:
                     System.out.print(lexer.lexeme);
@@ -105,20 +109,25 @@ public class Utilities {
                     break;
                 case STRINGCONST:
                     System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "STRINGCONST", true));
-                    break;                  
+                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "STRINGCONST", false));
+                    break;
+                case MULTILINEERROR:
+                    String[] errorMultiline = lexer.lexeme.split(",");
+                    String multilineError = lexer.lexeme.split(",")[3];
+                    String line = errorMultiline[0];
+                    listOfErrors.add("Error, no se finalizo el comentario " + multilineError + " en la linea " + line);
                 case ERROR:
                     String[] error = lexer.lexeme.split(",");
-                    String tokenThatFailed = error[1];
-                    String line = error[0];
-                    listOfErrors.add("Error, no se reconocio el siguiente token " + tokenThatFailed + " en la linea " + line);
+                    String tokenThatFailedError = error[1];
+                    String lineError = error[0];
+                    listOfErrors.add("Error, no se reconocio el siguiente token " + tokenThatFailedError + " en la linea " + lineError);
                     break;
                 default:
                     resultado=resultado;
             }
         }
         if (!listOfErrors.isEmpty()){
-            jTextArea1.setText("");
+            jTextArea1.append("\n ERRORES: \n");
             while(!listOfErrors.isEmpty())
                 jTextArea1.append(listOfErrors.removeFirst() + "\n");
         }

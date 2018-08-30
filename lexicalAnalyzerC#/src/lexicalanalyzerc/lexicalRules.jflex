@@ -9,17 +9,20 @@ import static lexicalanalyzerc.Token.*;
 %line
 %column
 
+
+doubleConstants = (({digits}+)\.{integerConstants}([Ee]("+"|"-"))?({digits}+)?)
 keywords=("void"|"int"|"double"|"bool"|"string"|"class"|"interface"|"null"|"this"|"extends"|"implements"|"for"|"while"|"if"|"else"|"return"|"break"|"New"|"NewArray")
 digits=[0-9]
-ID=([a-zA-Z]([a-zA-Z_0-9])*){1,31}
+ID=([a-zA-Z]([a-zA-Z_0-9])*)
+
 symbols=("+"|"-"|"*"|"/"|"%"|"<"|"<="|">"|">="|"="|"=="|"!="|"&&"|"||"|"!"|";"|","|"."|"["|"]"|"("|")"|"{"|"}"|"[]"|"()"|"{}")
 booleanConstants = ("true"|"false")
 integerConstants = [1-9]({digits}*)
 hexConstants = 0[xX]({integerConstants}[a-fA-F])+ 
-doubleConstants = {integerConstants}\.{integerConstants}([Ee]("+"|"-"))?({digits}+)
 stringConstants = (('([^'\\]|\\.)*')|(\"([^\"\\]|\\.)*\"))
 commentsSymbols=(((\/\/)[^\r\n]*)|(("/*")~("*/")))
 commentsMultilineError = (("/*")~(\n))
+stringError = ((\")~(\n))
 whiteSpace=([ \s\t\r] | \r\n | \n | " ")
 
 %{
@@ -36,8 +39,9 @@ public String lexeme="";
 {hexConstants} {lexeme= Integer.toString(yyline + 1) + "," + (yycolumn + 1) + "," + Integer.toString(yylength() + yycolumn) + "," + yytext(); return HEXCONST;}
 {doubleConstants} {lexeme= Integer.toString(yyline + 1) + "," + (yycolumn + 1) + "," + Integer.toString(yylength() + yycolumn) + "," + yytext(); return DOUBLECONST;}
 {stringConstants} {lexeme= Integer.toString(yyline + 1) + "," + (yycolumn + 1) + "," + Integer.toString(yylength() + yycolumn) + "," + yytext(); return STRINGCONST;}
+{commentsMultilineError} {lexeme= Integer.toString(yyline + 1) + "," + (yycolumn + 1) + "," + Integer.toString(yylength() + yycolumn) + "," + yytext(); return MULTILINEERROR;}
 //{intVal}({ID}|{variable}) {lexeme = Integer.toString(yyline + 1) + "," + yytext(); return ERROR;}
-{commentsMultilineError} |. {lexeme = Integer.toString(yyline + 1) + "," + yytext(); return ERROR;}
+. {lexeme = Integer.toString(yyline + 1) + "," + yytext(); return ERROR;}
 
 
 
