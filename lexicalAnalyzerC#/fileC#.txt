@@ -1,29 +1,6 @@
-//Hola
-1.25
-0.1
-.012155
-0x1A
-ID
-if
-else
-true
-1235
-0.12656
-asdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddsadas 6515416541
-dasdasd sdadasdas dasdasdasdasdas
-1231213dasdasdas
-"dasdasdasdasd"
-/*dasdasdadasdasdasdas
-dasdasdadasdasdasdasasda
-dasdasdasdasEOF
-"dasndash\'dkjabskdbas"
-1x1A
-/*dasdsadasdasdas*/
-/*
-dasdasdassadasdasdas
-dasdasdasdasdasdasdasdasda
-*/
-/*dasdasdasdasdasdasdasdasda
-/*dasdasdasdasdasdasdasdasdadas
-adasdasdasdasdasdasd
-5
+#define PUBLIC void TEST{
+Print(2 + 2 * 10);
+"hola mi nombre es Diego pero me dicen "OSO""
+"holaaaaaa
+void
+}

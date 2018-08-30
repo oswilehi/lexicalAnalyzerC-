@@ -81,11 +81,11 @@ public class Utilities {
                     break;
                 case ID:
                     System.out.print(lexer.lexeme);
-                    String id = lexer.lexeme.split(",")[3];
+                    String id = lexer.lexeme.split(",")[1];
                     if (id.length() <= 31 )
                         jTextArea1.append(Utilities.getVariables(lexer.lexeme, "ID", false));
                     else
-                        listOfErrors.add("Error, el ID: " + id + " supera los 31 caracteres en la linea " + lexer.lexeme.split(",")[0]);
+                        listOfErrors.add("El ID: " + id + " supera los 31 caracteres en la linea " + lexer.lexeme.split(",")[0]);
                     break;    
                 case SYMBOLS:
                     System.out.print(lexer.lexeme);
@@ -113,14 +113,15 @@ public class Utilities {
                     break;
                 case MULTILINEERROR:
                     String[] errorMultiline = lexer.lexeme.split(",");
-                    String multilineError = lexer.lexeme.split(",")[3];
+                    String multilineError = lexer.lexeme.split(",")[1];
                     String line = errorMultiline[0];
-                    listOfErrors.add("Error, no se finalizo el comentario " + multilineError + " en la linea " + line);
+                    listOfErrors.add("No se finalizo el comentario " + multilineError + " en la linea " + line);
+                    break;
                 case ERROR:
                     String[] error = lexer.lexeme.split(",");
                     String tokenThatFailedError = error[1];
                     String lineError = error[0];
-                    listOfErrors.add("Error, no se reconocio el siguiente token " + tokenThatFailedError + " en la linea " + lineError);
+                    listOfErrors.add("No se reconocio el siguiente token " + tokenThatFailedError  + " en la linea " + lineError);
                     break;
                 default:
                     resultado=resultado;
@@ -161,13 +162,13 @@ public class Utilities {
     
     public static String getVariables(String lexema, String tokenType, boolean value){
         line = lexema.split(",")[0];
-        columns = lexema.split(",")[1] + "-" + lexema.split(",")[2];
+        columns = lexema.split(",")[3] + "-" + lexema.split(",")[2];
         typeOfToken = tokenType;
         if (value)
-            val = lexema.split(",")[3];
+            val = lexema.split(",")[1];
         else
             val = "-1";
-        lexemaToAnalyze = lexema.split(",")[3];
+        lexemaToAnalyze = lexema.split(",")[1];
         
         return shapeSentence(lexemaToAnalyze, line, columns, typeOfToken, val);
         
