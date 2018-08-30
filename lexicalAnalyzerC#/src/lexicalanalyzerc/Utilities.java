@@ -77,7 +77,7 @@ public class Utilities {
                     break;                    
                 case KEYWORDS:
                     System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "KEYWORDS", false));
+                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_KEYWORDS", false));
                     break;
                 case ID:
                     System.out.print(lexer.lexeme);
@@ -89,27 +89,27 @@ public class Utilities {
                     break;    
                 case SYMBOLS:
                     System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "SYMBOLS", false));
+                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_SYMBOLS", false));
                     break;
                 case BOOLCONST:
                     System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "BOOLCONST", false));
+                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_BOOLCONST", false));
                     break;
                 case INTEGERCONST:
                     System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "INTEGERCONST", true));
+                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_INTEGERCONST", true));
                     break;
                 case HEXCONST:
                     System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "HEXCONST", true));
+                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_HEXCONST", true));
                     break;
                 case DOUBLECONST:
                     System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "DOUBLECONST", true));
+                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_DOUBLECONST", true));
                     break;
                 case STRINGCONST:
                     System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "STRINGCONST", false));
+                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_STRINGCONST", false));
                     break;
                 case MULTILINEERROR:
                     String[] errorMultiline = lexer.lexeme.split(",");
@@ -177,9 +177,9 @@ public class Utilities {
     public static String shapeSentence(String lexemaToAnalyze, String line, String columns, String typeOfToken, String val){
         String sentence;
         if (val.equals("-1"))
-            sentence = lexemaToAnalyze + "    line " + line + "   cols " + columns + "    is " + typeOfToken + "\n";
+            sentence = lexemaToAnalyze + "  line " + line + "   cols    " + columns + " is  " + typeOfToken + "\n";
         else
-            sentence = lexemaToAnalyze + "    line " + line + "   cols " + columns + "    is " + typeOfToken + "  (value = " + val + ")\n";
+            sentence = lexemaToAnalyze + "  line " + line + "   cols    " + columns + " is  " + typeOfToken + " (value = " + val + ")\n";
         
         return sentence;
         

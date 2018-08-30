@@ -1,6 +1,16 @@
-#define PUBLIC void TEST{
-Print(2 + 2 * 10);
-"hola mi nombre es Diego pero me dicen "OSO""
-"holaaaaaa
-void
-}
+// this file should not generate any output
+// here is a comment
+/* here is a simple comment */
+/* here
+is
+a
+multi-line
+comment
+*/
+
+/* here are some nasty comments: */
+/* ///// /// */
+/*******/
+
+/*    /* an almost-nested comment */
+"all done!"
