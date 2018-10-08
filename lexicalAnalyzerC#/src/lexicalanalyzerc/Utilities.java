@@ -84,8 +84,12 @@ public class Utilities {
                     String id = lexer.lexeme.split(",")[1];
                     if (id.length() <= 31 )
                         jTextArea1.append(Utilities.getVariables(lexer.lexeme, "ID", false));
-                    else
+                    else{
+                        jTextArea1.append(Utilities.getVariables(lexer.lexeme.split(",")[0]+"," + id.substring(0, 31)+","+lexer.lexeme.split(",")[2]+","+lexer.lexeme.split(",")[3], "ID", false));
                         listOfErrors.add("El ID: " + id + " supera los 31 caracteres en la linea " + lexer.lexeme.split(",")[0]);
+                    }
+                    
+                        
                     break;    
                 case SYMBOLS:
                     System.out.print(lexer.lexeme);
