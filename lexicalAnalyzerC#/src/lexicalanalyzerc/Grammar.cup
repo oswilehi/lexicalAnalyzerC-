@@ -1,0 +1,167 @@
+package lexicalanalyzerc;
+import java_cup.runtime.*;
+
+
+parser code {:
+    public String listaErrores ="";
+    public void syntax_error(Symbol s){
+		report_error("Error de sintaxis. Columna: " + (s.right + 1) +
+		" Linea: " + (s.left +1) + ". Texto: \"" + s.value + "\"", null);
+            listaErrores+="Error de sintaxis. Columna: " + (s.right + 1) +
+		" Linea: " + s.left + ". Texto: \"" + s.value + "\""+"\r\n";
+	}
+        public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception 
+        {
+         //report_fatal_error("Fatal Error: " + s.value, null);
+        }
+    /*public void syntax_error(Symbol cur_token) {  
+        listaErrores +=  " Sintac Message Line: " + (cur_token.left+1) + " Col: " +(cur_token.right+1) + " Text: " + cur_token.value+"\n";
+   }
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception 
+    {
+    }*/
+:};
+
+terminal            semicolon, intConstantType, doubleConstantType, boolConstantType, stringConstantType, lBracket, rBracket, lParenthesis, rParenthesis, VOID,
+                    comma, CLASS, EXTENDS, lBrace, rBrace, IMPLEMENTS, INTERFACE, IF, ELSE, FOR, WHILE, RETURN,
+                    BREAK, PRINT, EQUAL, THIS, PLUS, MINUS, TIMES, DIV, MOD, LESST, LESSTE, MORET, MORETE, EQUALTO,
+                    NOEQUAL, AND, OR, NOT, NEW_KW, NEWARRAY_KW, READINT_KW, READLINE_KW, MALLOC_KW, point, GETBYTE_M,
+                    SETBYTE_M, NULL, BRACKETS;
+
+terminal String     ident, stringConstants;
+terminal Integer    integerConstants;
+terminal Double     doubleConstants;
+terminal Boolean    booleanConstants;
+
+non terminal        Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
+                    InterfaceDecl, Prototype, StmtBlock, Stmt, IfStmt, WhileStmt, ForStmt, ReturnStmt, 
+                    BreakStmt, PrintStmt, Expr, LValue, Call, LibCall, Actuals, Constant;
+
+//no terminals maded by me
+
+non terminal        DeclLR, FormalsLR, ClassOptional, ClassOptional2, ClassOptional3, ClassClosing,
+                    InterfaceClosing, VariableDeclClosing, StmtClosing, ExprOptional, ExprLR, IfStmtElse;
+
+precedence left EQUAL, OR, AND, EQUALTO, NOEQUAL;
+precedence left LESST, LESSTE, MORET, MORETE;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIV, MOD;
+precedence left NOT;
+precedence left lBracket, point;
+precedence nonassoc ELSE;
+
+
+
+Program             ::= Decl DeclLR;
+DeclLR              ::= Decl DeclLR 
+                    |;
+Decl                ::= VariableDecl
+                    | FunctionDecl
+                    | ClassDecl 
+                    | InterfaceDecl
+                    | error semicolon
+                    | error rBrace;
+
+VariableDecl        ::= Variable semicolon;
+Variable            ::= Type ident;
+Type                ::= intConstantType
+                    | doubleConstantType
+                    | boolConstantType
+                    | stringConstantType
+                    | ident
+                    | Type BRACKETS;
+FunctionDecl        ::= Type ident lParenthesis Formals rParenthesis StmtBlock
+                    | VOID ident lParenthesis Formals rParenthesis StmtBlock;
+Formals             ::= Variable FormalsLR |;
+FormalsLR           ::= comma Variable FormalsLR
+                    |;
+ClassDecl           ::= CLASS ident ClassOptional ClassOptional2 lBrace ClassClosing rBrace;
+ClassOptional       ::= EXTENDS ident
+                    |;
+ClassOptional2      ::= IMPLEMENTS ident ClassOptional3
+                    |;
+ClassOptional3      ::= comma ident ClassOptional3
+                    |;
+ClassClosing        ::= Field ClassClosing
+                    |;
+Field               ::= VariableDecl
+                    | FunctionDecl;
+InterfaceDecl       ::= INTERFACE ident lBrace InterfaceClosing rBrace;
+InterfaceClosing    ::= Prototype InterfaceClosing
+                    |;
+Prototype           ::= Type ident lParenthesis Formals rParenthesis semicolon
+                    | VOID  ident   lParenthesis Formals rParenthesis semicolon;
+StmtBlock           ::= lBrace VariableDeclClosing StmtClosing rBrace;
+VariableDeclClosing ::= VariableDeclClosing VariableDecl 
+                    |;
+StmtClosing         ::= Stmt StmtClosing
+                    |;
+Stmt                ::= ExprOptional semicolon
+                    | IfStmt
+                    | WhileStmt
+                    | ForStmt
+                    | BreakStmt
+                    | ReturnStmt
+                    | PrintStmt
+                    | StmtBlock;
+ExprOptional        ::= Expr
+                    |;
+IfStmt              ::= IF lParenthesis Expr rParenthesis Stmt IfStmtElse;
+IfStmtElse          ::=  ELSE Stmt
+                    |;
+WhileStmt           ::= WHILE lParenthesis Expr rParenthesis Stmt;
+ForStmt             ::= FOR lParenthesis ExprOptional semicolon Expr semicolon ExprOptional rParenthesis Stmt;
+ReturnStmt          ::= RETURN ExprOptional semicolon;
+BreakStmt           ::= BREAK semicolon;
+PrintStmt           ::= PRINT lParenthesis Expr ExprLR rParenthesis semicolon;
+ExprLR              ::= comma Expr ExprLR
+                    |;
+Expr                ::= LValue EQUAL Expr
+                    | Constant
+                    | LValue
+                    | THIS
+                    | Call
+                    | lParenthesis Expr rParenthesis
+                    | Expr PLUS Expr
+                    | Expr MINUS Expr
+                    | Expr TIMES Expr
+                    | Expr DIV Expr
+                    | Expr MOD Expr
+                    | MINUS Expr
+                    | Expr LESST Expr
+                    | Expr LESSTE Expr
+                    | Expr MORET Expr
+                    | Expr MORETE Expr
+                    | Expr EQUALTO Expr
+                    | Expr NOEQUAL Expr
+                    | Expr AND Expr
+                    | Expr OR Expr
+                    | NOT Expr
+                    | NEW_KW lParenthesis ident rParenthesis
+                    | NEWARRAY_KW lParenthesis Expr comma Type rParenthesis
+                    | READINT_KW lParenthesis rParenthesis
+                    | READLINE_KW lParenthesis rParenthesis
+                    | MALLOC_KW lParenthesis Expr rParenthesis;
+LValue              ::= ident
+                    | Expr point ident
+                    | Expr lBracket Expr rBracket;
+
+Call                ::= ident lParenthesis Actuals rParenthesis
+                    | Expr point ident lParenthesis Actuals rParenthesis
+                    | Expr point LibCall lParenthesis Actuals rParenthesis;
+LibCall             ::= GETBYTE_M lParenthesis Expr rParenthesis
+                    | SETBYTE_M lParenthesis Expr comma Expr rParenthesis;
+Actuals             ::= Expr ExprLR
+                    |;
+Constant            ::= integerConstants
+                    | doubleConstants
+                    | booleanConstants
+                    | stringConstants
+                    | NULL;
+                
+
+
+
+
+
+

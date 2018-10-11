@@ -35,6 +35,8 @@ public class Utilities {
     static String columns;
     static String typeOfToken;
     static String val;
+    static String ruta;
+    static File File;
     
     public static String removeExtension (String word){
         char[] wordChar = word.toCharArray();
@@ -60,83 +62,27 @@ public class Utilities {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(frameAnalyzer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Reader reader = new BufferedReader(new FileReader("fileC#.txt"));
-
-        lexicalRules lexer = new lexicalRules(reader);
-        String resultado="";
-        while (true){
-            Token token = lexer.yylex();
+        //Reader reader = new FileReader("fileC#.txt
+        
+        
+        
+        Reader targetReader = new FileReader(File);
+           
+        lexicalRules lexer = new lexicalRules(targetReader);
+        syntacticRules rules = new syntacticRules(lexer);
+        try
+        {
+            rules.debug_parse();
             
-            if (token == null)
-                break;
-            
-            
-            switch (token){
-                case WHITESPACE:
-                    System.out.print(lexer.lexeme);
-                    break;                    
-                case KEYWORDS:
-                    System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_KEYWORDS", false));
-                    break;
-                case ID:
-                    System.out.print(lexer.lexeme);
-                    String id = lexer.lexeme.split(",")[1];
-                    if (id.length() <= 31 )
-                        jTextArea1.append(Utilities.getVariables(lexer.lexeme, "ID", false));
-                    else{
-                        jTextArea1.append(Utilities.getVariables(lexer.lexeme.split(",")[0]+"," + id.substring(0, 31)+","+lexer.lexeme.split(",")[2]+","+lexer.lexeme.split(",")[3], "ID", false));
-                        listOfErrors.add("El ID: " + id + " supera los 31 caracteres en la linea " + lexer.lexeme.split(",")[0]);
-                    }
-                    
-                        
-                    break;    
-                case SYMBOLS:
-                    System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_SYMBOLS", false));
-                    break;
-                case BOOLCONST:
-                    System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_BOOLCONST", false));
-                    break;
-                case INTEGERCONST:
-                    System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_INTEGERCONST", true));
-                    break;
-                case HEXCONST:
-                    System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_HEXCONST", true));
-                    break;
-                case DOUBLECONST:
-                    System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_DOUBLECONST", true));
-                    break;
-                case STRINGCONST:
-                    System.out.print(lexer.lexeme);
-                    jTextArea1.append(Utilities.getVariables(lexer.lexeme, "T_STRINGCONST", false));
-                    break;
-                case MULTILINEERROR:
-                    String[] errorMultiline = lexer.lexeme.split(",");
-                    String multilineError = lexer.lexeme.split(",")[1];
-                    String line = errorMultiline[0];
-                    listOfErrors.add("No se finalizo el comentario " + multilineError + " en la linea " + line);
-                    break;
-                case ERROR:
-                    String[] error = lexer.lexeme.split(",");
-                    String tokenThatFailedError = error[1];
-                    String lineError = error[0];
-                    listOfErrors.add("No se reconocio el siguiente token " + tokenThatFailedError  + " en la linea " + lineError);
-                    break;
-                default:
-                    resultado=resultado;
-            }
+            if(rules.listaErrores.equals(""))
+                jTextArea1.append("No hay errores");
+            else
+                jTextArea1.append(rules.listaErrores);  
         }
-        if (!listOfErrors.isEmpty()){
-            jTextArea1.append("\n ERRORES: \n");
-            while(!listOfErrors.isEmpty())
-                jTextArea1.append(listOfErrors.removeFirst() + "\n");
-        }
+        catch (Exception e)
+        {
             
+        }                                 
     }
     
     public static String constanstDefine(int simpleComma, int doubleComma, String word){
