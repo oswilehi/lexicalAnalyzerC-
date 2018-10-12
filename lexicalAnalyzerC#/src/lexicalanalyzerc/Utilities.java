@@ -81,7 +81,7 @@ public class Utilities {
             
             
             if(rules.listOfErrors.equals(""))
-                jTextArea1.append("\n" + "No hay errores léxicos" + "\n");
+                jTextArea1.append("\n" + "No hay errores sintácticos" + "\n");
             else
                 jTextArea1.append(rules.listOfErrors);
         }
