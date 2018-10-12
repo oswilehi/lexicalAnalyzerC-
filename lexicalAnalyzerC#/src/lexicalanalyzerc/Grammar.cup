@@ -3,23 +3,17 @@ import java_cup.runtime.*;
 
 
 parser code {:
-    public String listaErrores ="";
+    public String listOfErrors ="";
     public void syntax_error(Symbol s){
-		report_error("Error de sintaxis. Columna: " + (s.right + 1) +
-		" Linea: " + (s.left +1) + ". Texto: \"" + s.value + "\"", null);
-            listaErrores+="Error de sintaxis. Columna: " + (s.right + 1) +
-		" Linea: " + s.left + ". Texto: \"" + s.value + "\""+"\r\n";
+		report_error("Error de sintaxis. Línea: " + (s.right + 1) +
+		" Columna: " + (s.left +1) + ". Texto: \"" + s.value + "\"", null);
+            listOfErrors+="Línea: " + (s.right + 1) +
+		" Columna: " + s.left + " Error de sintaxis. Texto: \"" + s.value + "\""+"\r\n";
 	}
         public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception 
         {
          //report_fatal_error("Fatal Error: " + s.value, null);
         }
-    /*public void syntax_error(Symbol cur_token) {  
-        listaErrores +=  " Sintac Message Line: " + (cur_token.left+1) + " Col: " +(cur_token.right+1) + " Text: " + cur_token.value+"\n";
-   }
-    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception 
-    {
-    }*/
 :};
 
 terminal            semicolon, intConstantType, doubleConstantType, boolConstantType, stringConstantType, lBracket, rBracket, lParenthesis, rParenthesis, VOID,
@@ -33,7 +27,7 @@ terminal Integer    integerConstants;
 terminal Double     doubleConstants;
 terminal Boolean    booleanConstants;
 
-non terminal        Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
+non terminal Object Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
                     InterfaceDecl, Prototype, StmtBlock, Stmt, IfStmt, WhileStmt, ForStmt, ReturnStmt, 
                     BreakStmt, PrintStmt, Expr, LValue, Call, LibCall, Actuals, Constant;
 
@@ -42,12 +36,13 @@ non terminal        Program, Decl, VariableDecl, Variable, Type, FunctionDecl, F
 non terminal        DeclLR, FormalsLR, ClassOptional, ClassOptional2, ClassOptional3, ClassClosing,
                     InterfaceClosing, VariableDeclClosing, StmtClosing, ExprOptional, ExprLR, IfStmtElse;
 
-precedence left EQUAL, OR, AND, EQUALTO, NOEQUAL;
-precedence left LESST, LESSTE, MORET, MORETE;
+precedence left EQUAL;
+precedence left OR, AND;
+precedence nonassoc LESST, LESSTE, MORET, MORETE, EQUALTO, NOEQUAL;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV, MOD;
-precedence left NOT;
-precedence left lBracket, point;
+precedence nonassoc NOT;
+precedence nonassoc lBracket, point;
 precedence nonassoc ELSE;
 
 

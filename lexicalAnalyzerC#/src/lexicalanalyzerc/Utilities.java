@@ -70,19 +70,25 @@ public class Utilities {
            
         lexicalRules lexer = new lexicalRules(targetReader);
         syntacticRules rules = new syntacticRules(lexer);
+        
         try
         {
-            rules.debug_parse();
+            //rules.debug_parse();
+            rules.parse();
+            jTextArea1.append(lexer.lexicalError);
+            System.out.print(lexer.lexicalError);
             
-            if(rules.listaErrores.equals(""))
-                jTextArea1.append("No hay errores");
+            
+            
+            if(rules.listOfErrors.equals(""))
+                jTextArea1.append("\n" + "No hay errores léxicos" + "\n");
             else
-                jTextArea1.append(rules.listaErrores);  
+                jTextArea1.append(rules.listOfErrors);
         }
         catch (Exception e)
         {
             
-        }                                 
+        }                            
     }
     
     public static String constanstDefine(int simpleComma, int doubleComma, String word){

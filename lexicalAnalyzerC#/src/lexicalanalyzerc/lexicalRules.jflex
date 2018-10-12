@@ -1,5 +1,6 @@
 package lexicalanalyzerc;
 import java_cup.runtime.*;
+import javax.swing.JTextArea;
 
 %%
 
@@ -11,6 +12,9 @@ import java_cup.runtime.*;
 %cup
 %cupdebug
 
+%{
+    String lexicalError = "";
+%}
 
 digits=[0-9]
 booleanConstants = ("true"|"false")
@@ -40,6 +44,12 @@ public String lexeme="";
 %%
 <YYINITIAL>{
 {commentsSymbols} {}
+{lBrace} {return new Symbol(sym.lBrace, yycolumn, yyline, yytext());}
+{rBrace} {return new Symbol(sym.rBrace, yycolumn, yyline, yytext());}
+{lParenthesis} {return new Symbol(sym.lParenthesis, yycolumn, yyline, yytext());}
+{rParenthesis} {return new Symbol(sym.rParenthesis, yycolumn, yyline, yytext());}
+{lBracket} {return new Symbol(sym.lBracket, yycolumn, yyline, yytext());}
+{rBracket} {return new Symbol(sym.rBracket, yycolumn, yyline, yytext());}
 "void"     {return new Symbol(sym.VOID, yycolumn, yyline, yytext());}
 "class"    {return new Symbol(sym.CLASS, yycolumn, yyline, yytext());}
 "extends"   {return new Symbol(sym.EXTENDS, yycolumn, yyline, yytext());}
@@ -88,20 +98,13 @@ public String lexeme="";
 {stringConstants}  {return new Symbol(sym.stringConstants, yycolumn, yyline, yytext());}
 {semicolon} {return new Symbol(sym.semicolon, yycolumn, yyline, yytext());}
 {Comma}     {{return new Symbol(sym.comma, yycolumn, yyline, yytext());}}
-{lParenthesis} {return new Symbol(sym.lParenthesis, yycolumn, yyline, yytext());}
-{rParenthesis} {return new Symbol(sym.rParenthesis, yycolumn, yyline, yytext());}
-{lBrace} {return new Symbol(sym.lBrace, yycolumn, yyline, yytext());}
-{rBrace} {return new Symbol(sym.rBrace, yycolumn, yyline, yytext());}
-{lBracket} {return new Symbol(sym.lBracket, yycolumn, yyline, yytext());}
-{rBracket} {return new Symbol(sym.rBracket, yycolumn, yyline, yytext());}
 {ID}  {return new Symbol(sym.ident, yycolumn, yyline, yytext());}
-{commentsMultilineError}  {return null;}
 [\t\r]      {}
 [\r\n]+    {}
 {whiteSpace}  {}
 [\s\t\r\v\f]   {}
 }
-. {lexeme = yytext(); }
+. | {commentsMultilineError} {lexicalError +="Linea: " + yyline + " Col: " + yycolumn + "Error léxico. Texto: " + yytext()  +"\r\n";}
 
 
 
