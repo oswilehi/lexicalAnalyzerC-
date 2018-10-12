@@ -163,7 +163,9 @@ public class frameAnalyzer extends javax.swing.JFrame {
 
         if(valor == JFileChooser.APPROVE_OPTION){
             cFile = openAsmFile.getSelectedFile();
+            Utilities.File = cFile;
             fileName = Utilities.removeExtension(cFile.getName());;
+            Utilities.ruta = cFile.getPath();
             try (BufferedReader br = new BufferedReader(new FileReader(cFile)))
             {
                 String line;
