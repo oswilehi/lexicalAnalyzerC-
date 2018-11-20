@@ -68,8 +68,8 @@ public class Utilities {
         
         Reader targetReader = new FileReader(File);
            
-        lexicalRules lexer = new lexicalRules(targetReader);
-        syntacticRules rules = new syntacticRules(lexer);
+       lexicalRules lexer = new lexicalRules(targetReader);
+       Rules rules = new Rules(lexer);
         
         try
         {
@@ -88,7 +88,7 @@ public class Utilities {
         catch (Exception e)
         {
             
-        }                            
+        }                      
     }
     
     public static String constanstDefine(int simpleComma, int doubleComma, String word){

@@ -93,8 +93,8 @@ public String lexeme="";
 "[]"        {return new Symbol(sym.BRACKETS, yycolumn, yyline, yytext());}
 "="         {return new Symbol(sym.EQUAL, yycolumn, yyline, yytext());}
 {booleanConstants}  {return new Symbol(sym.booleanConstants, yycolumn, yyline, yytext());}
-{integerConstants} | {hexConstants}   {return new Symbol(sym.integerConstants, yycolumn, yyline, yytext());}
-{doubleConstants}  {return new Symbol(sym.doubleConstants, yycolumn, yyline, yytext());}
+{integerConstants} | {hexConstants}   {return new Symbol(sym.integerConstants, yycolumn, yyline, new Integer(yytext()));}
+{doubleConstants}  {return new Symbol(sym.doubleConstants, yycolumn, yyline, new Double(yytext()));}
 {stringConstants}  {return new Symbol(sym.stringConstants, yycolumn, yyline, yytext());}
 {semicolon} {return new Symbol(sym.semicolon, yycolumn, yyline, yytext());}
 {Comma}     {{return new Symbol(sym.comma, yycolumn, yyline, yytext());}}

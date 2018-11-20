@@ -884,7 +884,7 @@ public String lexeme="";
             }
           case 58: break;
           case 2: 
-            { return new Symbol(sym.integerConstants, yycolumn, yyline, yytext());
+            { return new Symbol(sym.integerConstants, yycolumn, yyline, new Integer(yytext()));
             }
           case 59: break;
           case 3: 
@@ -968,7 +968,7 @@ public String lexeme="";
             }
           case 79: break;
           case 23: 
-            { return new Symbol(sym.doubleConstants, yycolumn, yyline, yytext());
+            { return new Symbol(sym.doubleConstants, yycolumn, yyline, new Double(yytext()));
             }
           case 80: break;
           case 24: 
