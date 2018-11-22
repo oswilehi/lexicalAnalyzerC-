@@ -14,7 +14,7 @@ parser code {:
 	}
         public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception 
         {
-         //report_fatal_error("Fatal Error: " + s.value, null);
+            report_fatal_error("Fatal Error: " + s.value, null);
         }
 :};
 
@@ -24,6 +24,20 @@ action code {:
       LinkedList<String> ambits =  new LinkedList<String>();
       boolean isParameter = false;
       String typeStmt = "noName";
+
+      public String getType (Object obj){
+    Integer temp;
+    if (obj instanceof Integer)
+        return "int";
+    else if (obj instanceof Double)
+        return "double";
+    else if (obj instanceof String)
+        return "string";
+    else if (obj instanceof Boolean)
+        return "boolean";
+    else 
+        return "n";
+  }  
 :};
 
 terminal            semicolon, intConstantType, doubleConstantType, boolConstantType, stringConstantType, lBracket, rBracket, lParenthesis, rParenthesis, VOID,
@@ -55,7 +69,7 @@ precedence nonassoc NOT;
 precedence nonassoc lBracket, point;
 precedence nonassoc ELSE;
 
-
+start with Program;
 
 Program             ::= Decl DeclLR;
 DeclLR              ::= Decl DeclLR 
@@ -74,22 +88,33 @@ Variable            ::= Type:t ident:i {:
                            val = "0";
                         if(ambit.equals(""))
                         {
-                              if(isParameter)
+                              if(isParameter){
                                     table.addSymbolS(new ObjectS(i,String.valueOf(t),val,"Parametro","global"), ambits); 
+                                    table.addToLog("Se declaro el parametro  con el nombre " + i + " de tipo " + String.valueOf(t) + " en el ambito global");
+                              }
+                                   
                               else
-                                    table.addSymbolS(new ObjectS(i,String.valueOf(t),val,"Variable","global"), ambits);       
+                              {
+                                    table.addSymbolS(new ObjectS(i,String.valueOf(t),val,"Variable","global"), ambits);
+                                    table.addToLog("Se declaro la variable con el nombre " +  i + " de tipo " + String.valueOf(t) + " en el ambito global");
+                              }
+                                           
                         }
                               
                         else
                         {
                               if(isParameter)
+                              {
                                     table.addSymbolS(new ObjectS(i,String.valueOf(t),val,"Parametro",ambit), ambits);
+                                    table.addToLog("Se declaro la variable con el nombre " +  i + " de tipo " + String.valueOf(t) + " en el ambito " + ambit);
+                              }
+                                    
                               else
+                              {
                                     table.addSymbolS(new ObjectS(i,String.valueOf(t),val,"Variable",ambit), ambits);
+                                    table.addToLog("Se declaro la variable con el nombre " +  i + " de tipo " + String.valueOf(t) + " en el ambito " + ambit);
+                              }         
                         }
-                              
-
-
                         :};
 Type                ::= intConstantType:t {:RESULT = t;:}
                     | doubleConstantType:t {:RESULT = t;:}
@@ -99,31 +124,54 @@ Type                ::= intConstantType:t {:RESULT = t;:}
                     | Type BRACKETS;
 FunctionDecl        ::= Type:t ident:i {:
                         if(ambit.equals(""))
+                        {
                               table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Funcion","global"), ambits);
+                              table.addToLog("Se creo la funcion con el nombre " +  i + " de tipo " + String.valueOf(t) + " en el ambito global");
+                        }
+                              
                         else
-                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Funcion",ambit), ambits);     
+                        {
+                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Funcion","global"), ambits);
+                              table.addToLog("Se creo la funcion con el nombre " +  i + " de tipo " + String.valueOf(t) + " en el ambito " + ambits);
+                        }
+                                 
                         ambit = i;
-                        ambits.push(ambit);
+                        //ambits.push(ambit);
                         :}lParenthesis {:isParameter = true;:} Formals rParenthesis {:isParameter = false;:} StmtBlock
                     | VOID:t ident:i {:
                         if(ambit.equals(""))
+                        {
                               table.addSymbolS(new ObjectS(i,String.valueOf(t),"","VOID","global"), ambits);
+                              table.addToLog("Se creo el procedimiento con el nombre " +  i + " de tipo " + String.valueOf(t) + " en el ambito global");
+                        }
+                             
                         else
+                        {
                               table.addSymbolS(new ObjectS(i,String.valueOf(t),"","VOID",ambit), ambits);
+                              table.addToLog("Se creo el procedimiento con el nombre " +  i + " de tipo " + String.valueOf(t) + " en el ambito " + ambit);
+                        }               
                         ambit = i;
-                        ambits.push(ambit);
+                        //ambits.push(ambit);
                         :} lParenthesis {:isParameter = true;:}  Formals {:isParameter = false;:} rParenthesis StmtBlock;
 Formals             ::= Variable FormalsLR |;
 FormalsLR           ::= comma Variable FormalsLR
                     |;
 ClassDecl           ::= CLASS:t ident:i {:
                         if(ambit.equals(""))
+                        {
                               table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Clase","global"), ambits);
+                              table.addToLog("Se creo la clase con el nombre " +  i + " de tipo " + String.valueOf(t) + " en el ambito global");
+                        }
+                              
                         else
+                        {
                               table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Clase",ambit), ambits);
+                              table.addToLog("Se creo la clase con el nombre " +  i + " de tipo " + String.valueOf(t) + " en el ambito global");
+                        }
+                              
                          ambit = i;
-                         ambits.push(ambit);
-                        :} ClassOptional ClassOptional2 lBrace ClassClosing rBrace {:
+                         //ambits.push(ambit);
+                        :} ClassOptional ClassOptional2 lBrace {:ambits.push(ambit);:} ClassClosing rBrace {:
                                                                                     ambits.pop();/*ambits.push("fin"+ambit);*/
                                                                                     if(!ambits.isEmpty())
                                                                                     {
@@ -145,16 +193,22 @@ Field               ::= VariableDecl
                     | FunctionDecl;
 InterfaceDecl       ::= INTERFACE:t ident:i {:
                         if(ambit.equals(""))
-                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Inteface","global"), ambits);
+                        {
+                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Interface","global"), ambits);
+                              table.addToLog("Se creo la interface con el nombre " +  i + " de tipo " + String.valueOf(t) + " en el ambito global");
+                        }                            
                         else
-                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Inteface",ambit), ambits);
+                        {
+                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Interface",ambit), ambits);
+                              table.addToLog("Se creo la interface con el nombre " +  i + " de tipo " + String.valueOf(t) + " en el ambito " + ambit);
+                        }
+                              
                         ambit = i;
-                        ambits.push(ambit);
-                        :} lBrace InterfaceClosing rBrace {:
+                        //ambits.push(ambit);
+                        :} lBrace {:ambits.push(ambit);:} InterfaceClosing rBrace {:
                                                             ambits.pop();/*ambits.push("fin"+ambit);*/
                                                             if(!ambits.isEmpty())
-                                                               {
-                                                                  
+                                                               {              
                                                                   ambit = ambits.peek();
                                                                 }
                                                                 else{
@@ -168,8 +222,7 @@ Prototype           ::= Type ident lParenthesis Formals rParenthesis semicolon
 StmtBlock           ::= lBrace {:ambits.push(ambit);:} VariableDeclClosing StmtClosing rBrace {:
                                                                         ambits.pop();/*ambits.push("fin"+ambit);*/
                                                                         if(!ambits.isEmpty())
-                                                                           {
-                                                                             
+                                                                           {                                             
                                                                              ambit = ambits.peek();
                                                                             }
                                                                         else{
@@ -208,42 +261,278 @@ Expr                ::= LValue:i EQUAL Expr:e {:RESULT = e;
                                                 aux1.val = String.valueOf(RESULT);
                                                 table.addSymbolS(aux1, ambits);
                                                 table.addToLog("Se asigno el valor " + aux1.val + " a la " + aux1.objectType + " " + aux1.name + " de tipo " + aux1.type);
-                                               System.out.println(String.valueOf(i) + "= " + String.valueOf(RESULT));:}
+                                                System.out.println(String.valueOf(i) + "= " + String.valueOf(RESULT));:}
                     | Constant:c {:RESULT = c;:}
                     | LValue:a {:RESULT = a;:}
                     | THIS
                     | Call
-                    | lParenthesis Expr rParenthesis
+                    | lParenthesis Expr:e {:RESULT = e;:} rParenthesis
                     | Expr:e1 PLUS Expr:e2 {: if(e1 != null && e2 != null){
-                                                       RESULT = (Object) (Double.parseDouble(String.valueOf(e1)) + Double.parseDouble((String.valueOf(e2))));
-                                                        System.out.println(String.valueOf(RESULT)); 
-                                                }                              
-                                              :}
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("int")))
+                                                            RESULT = (Object) ((Integer.parseInt(String.valueOf(type1.val))) + Integer.parseInt((String.valueOf(type2.val))));
+                                                      else if((type1.type.equals(type2.type) && type1.type.equals("string")))
+                                                      {
+                                                            RESULT = (Object) (((String.valueOf(type1.val))) + String.valueOf((type2.val)));
+                                                      }
+                                                      else
+                                                      {
+                                                            if((type1.type.equals("int") && type2.type.equals("double")) || (type1.type.equals("double") && type2.type.equals("int")))
+                                                                  RESULT = (Object) ((Double.parseDouble(String.valueOf(type1.val))) + Double.parseDouble((String.valueOf(type2.val))));
+                                                            else
+                                                                  table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
                     | Expr:e1 MINUS Expr:e2 {: if(e1 != null && e2 != null){
-                                                       RESULT = (Object) (Double.parseDouble(String.valueOf(e1)) - Double.parseDouble((String.valueOf(e2))));
-                                                        System.out.println(String.valueOf(RESULT)); 
-                                                }                              
-                                              :} 
-                    | Expr TIMES Expr
-                    | Expr DIV Expr
-                    | Expr MOD Expr
-                    | MINUS Expr
-                    | Expr LESST Expr
-                    | Expr LESSTE Expr
-                    | Expr MORET Expr
-                    | Expr MORETE Expr
-                    | Expr EQUALTO Expr
-                    | Expr NOEQUAL Expr
-                    | Expr AND Expr
-                    | Expr OR Expr
-                    | NOT Expr
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("int")))
+                                                            RESULT = (Object) ((Integer.parseInt(String.valueOf(type1.val))) - Integer.parseInt((String.valueOf(type2.val))));
+                                                      else
+                                                      {
+                                                            if((type1.type.equals("int") && type2.type.equals("double")) || (type1.type.equals("double") && type2.type.equals("int")))
+                                                                  RESULT = (Object) ((Double.parseDouble(String.valueOf(type1.val))) - Double.parseDouble((String.valueOf(type2.val))));
+                                                            else
+                                                                  table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
+                    | Expr:e1 TIMES Expr:e2 {: if(e1 != null && e2 != null){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("int")))
+                                                            RESULT = (Object) ((Integer.parseInt(String.valueOf(type1.val))) * Integer.parseInt((String.valueOf(type2.val))));
+                                                      else
+                                                      {
+                                                            if((type1.type.equals("int") && type2.type.equals("double")) || (type1.type.equals("double") && type2.type.equals("int")))
+                                                                  RESULT = (Object) ((Double.parseDouble(String.valueOf(type1.val))) * Double.parseDouble((String.valueOf(type2.val))));
+                                                            else
+                                                                  table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
+                    | Expr:e1 DIV Expr:e2 {: if(e1 != null && e2 != null){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("int")))
+                                                            RESULT = (Object) ((Integer.parseInt(String.valueOf(type1.val))) / Integer.parseInt((String.valueOf(type2.val))));
+                                                      else
+                                                      {
+                                                            if((type1.type.equals("int") && type2.type.equals("double")) || (type1.type.equals("double") && type2.type.equals("int")))
+                                                                  RESULT = (Object) ((Double.parseDouble(String.valueOf(type1.val))) / Double.parseDouble((String.valueOf(type2.val))));
+                                                            else
+                                                                  table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
+                    | Expr:e1 MOD Expr:e2 {: if(e1 != null && e2 != null){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("int")))
+                                                            RESULT = (Object) ((Integer.parseInt(String.valueOf(type1.val))) % Integer.parseInt((String.valueOf(type2.val))));
+                                                      else
+                                                      {
+                                                            if((type1.type.equals("int") && type2.type.equals("double")) || (type1.type.equals("double") && type2.type.equals("int")))
+                                                                  RESULT = (Object) ((Double.parseDouble(String.valueOf(type1.val))) % Double.parseDouble((String.valueOf(type2.val))));
+                                                            else
+                                                                  table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
+                    | MINUS Expr:e {: if(e != null ){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      if (type1.type.equals("int"))
+                                                            RESULT = (Object) ((Integer.parseInt("0")) - Integer.parseInt((String.valueOf(type1.val))));
+                                                      else if (type1.type.equals("double"))
+                                                            RESULT = (Object) ((Double.parseDouble("0")) - Double.parseDouble((String.valueOf(type1.val))));
+                                                      else
+                                                      {
+                                                            table.addToLog("No se puede operar " + type1.type);
+                                                      }               
+                                                }:}
+                    | Expr:e1 LESST Expr:e2 {: if(e1 != null && e2 != null){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("int")))
+                                                            RESULT = (Object) ((Integer.parseInt(String.valueOf(type1.val))) < Integer.parseInt((String.valueOf(type2.val))));
+                                                      else
+                                                      {
+                                                            if((type1.type.equals("int") && type2.type.equals("double")) || (type1.type.equals("double") && type2.type.equals("int")))
+                                                                  RESULT = (Object) ((Double.parseDouble(String.valueOf(type1.val))) < Double.parseDouble((String.valueOf(type2.val))));
+                                                            else
+                                                                  table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
+                    | Expr:e1 LESSTE Expr:e2 {: if(e1 != null && e2 != null){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("int")))
+                                                            RESULT = (Object) ((Integer.parseInt(String.valueOf(type1.val))) <= Integer.parseInt((String.valueOf(type2.val))));
+                                                      else
+                                                      {
+                                                            if((type1.type.equals("int") && type2.type.equals("double")) || (type1.type.equals("double") && type2.type.equals("int")))
+                                                                  RESULT = (Object) ((Double.parseDouble(String.valueOf(type1.val))) <= Double.parseDouble((String.valueOf(type2.val))));
+                                                            else
+                                                                  table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
+                    | Expr:e1 MORET Expr:e2 {: if(e1 != null && e2 != null){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("int")))
+                                                            RESULT = (Object) (Boolean.valueOf((Integer.parseInt(String.valueOf(type1.val)))>Integer.parseInt((String.valueOf(type2.val)))));
+                                                      else
+                                                      {
+                                                            if((type1.type.equals("int") && type2.type.equals("double")) || (type1.type.equals("double") && type2.type.equals("int")))
+                                                                  RESULT = (Object) ((Double.parseDouble(String.valueOf(type1.val)))>Double.parseDouble((String.valueOf(type2.val))));
+                                                            else
+                                                                  table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
+                    | Expr:e1 MORETE Expr:e2 {: if(e1 != null && e2 != null){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("int")))
+                                                            RESULT = (Object) ((Integer.parseInt(String.valueOf(type1.val))) >= Integer.parseInt((String.valueOf(type2.val))));
+                                                      else
+                                                      {
+                                                            if((type1.type.equals("int") && type2.type.equals("double")) || (type1.type.equals("double") && type2.type.equals("int")))
+                                                                  RESULT = (Object) ((Double.parseDouble(String.valueOf(type1.val))) >= Double.parseDouble((String.valueOf(type2.val))));
+                                                            else
+                                                                  table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
+                    | Expr:e1 EQUALTO Expr:e2 {: if(e1 != null && e2 != null){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("int")))
+                                                            RESULT = (Object) ((Integer.parseInt(String.valueOf(type1.val))) == Integer.parseInt((String.valueOf(type2.val))));
+                                                      else if((type1.type.equals(type2.type) && type1.type.equals("string")))
+                                                      {
+                                                            RESULT = (Object) (((String.valueOf(type1.val))).equals(String.valueOf((type2.val))));
+                                                      }
+                                                      else if((type1.type.equals(type2.type) && type1.type.equals("bool")))
+                                                      {
+                                                            RESULT = (Object) ((((String.valueOf(type1.val))).equals(String.valueOf((type2.val)))));
+                                                      }
+                                                      else
+                                                      {
+                                                            if((type1.type.equals("int") && type2.type.equals("double")) || (type1.type.equals("double") && type2.type.equals("int")))
+                                                                  RESULT = (Object) ((Double.parseDouble(String.valueOf(type1.val))) == Double.parseDouble((String.valueOf(type2.val))));
+                                                            else
+                                                                  table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
+                    | Expr:e1 NOEQUAL Expr:e2 {: if(e1 != null && e2 != null){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("int")))
+                                                            RESULT = (Object) ((Integer.parseInt(String.valueOf(type1.val))) != Integer.parseInt((String.valueOf(type2.val))));
+                                                      else if((type1.type.equals(type2.type) && type1.type.equals("string")))
+                                                      {
+                                                            RESULT = (Object) (!(((String.valueOf(type1.val))).equals(String.valueOf((type2.val)))));
+                                                      }
+                                                      else if((type1.type.equals(type2.type) && type1.type.equals("bool")))
+                                                      {
+                                                            RESULT = (Object) (!(((String.valueOf(type1.val))).equals(String.valueOf((type2.val)))));
+                                                      }
+                                                      else
+                                                      {
+                                                            if((type1.type.equals("int") && type2.type.equals("double")) || (type1.type.equals("double") && type2.type.equals("int")))
+                                                                  RESULT = (Object) ((Double.parseDouble(String.valueOf(type1.val))) != Double.parseDouble((String.valueOf(type2.val))));
+                                                            else
+                                                                  table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
+                    | Expr:e1 AND Expr:e2 {: if(e1 != null && e2 != null){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("bool")))
+                                                            RESULT = (Object) (((Boolean.parseBoolean(type1.val))) && ((Boolean.parseBoolean(type2.val))));
+                                                      else
+                                                      {
+                                                            table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
+                    | Expr:e1 OR Expr:e2 {: if(e1 != null && e2 != null){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e1);
+                                                      ObjectS aux2 = new ObjectS();
+                                                      aux2.name = String.valueOf(e2);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      ObjectS type2 = table.getSymbolS(aux2, ambits);
+                                                      if ((type1.type.equals(type2.type) && type1.type.equals("bool")))
+                                                            RESULT = (Object) (((Boolean.parseBoolean(type1.val))) || ((Boolean.parseBoolean(type2.val))));
+                                                      else
+                                                      {
+                                                            table.addToLog("No se puede operar " + type1.type + " con " + type2.type);
+                                                      }               
+                                                }:}
+                    | NOT Expr:e {: if(e != null ){
+                                                      ObjectS aux1 = new ObjectS();
+                                                      aux1.name = String.valueOf(e);
+                                                      ObjectS type1 = table.getSymbolS(aux1, ambits);
+                                                      if ((type1.type.equals("bool")))
+                                                            RESULT = (Object) (!(((String.valueOf(type1.val))).equals(String.valueOf((type1.val)))));
+                                                      else
+                                                      {
+                                                            table.addToLog("No se puede operar " + type1.type);
+                                                      }              
+                                                }:}
                     | NEW_KW lParenthesis ident rParenthesis
                     | NEWARRAY_KW lParenthesis Expr comma Type rParenthesis
                     | READINT_KW lParenthesis rParenthesis
                     | READLINE_KW lParenthesis rParenthesis
                     | MALLOC_KW lParenthesis Expr rParenthesis;
 LValue              ::= ident:i {:RESULT = i;:}
-                    | Expr point ident 
+                    | Expr point ident
                     | Expr lBracket Expr rBracket;
 
 Call                ::= ident lParenthesis Actuals rParenthesis

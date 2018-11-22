@@ -60,5 +60,16 @@ public class tableOfSymbols {
         bitacora += s + "\n";
     }
     
-    
+    public String getType (Object obj){
+    if (obj instanceof Integer)
+        return "int";
+    else if (obj instanceof Double)
+        return "double";
+    else if (obj instanceof String)
+        return "string";
+    else if (obj instanceof Boolean)
+        return "boolean";
+    else 
+        return "n";
+  }  
 }

@@ -69,12 +69,12 @@ public class Utilities {
         Reader targetReader = new FileReader(File);
            
        lexicalRules lexer = new lexicalRules(targetReader);
-       RulesS rules = new RulesS(lexer);
+       RulesSS rules = new RulesSS(lexer);
        
         try
         {
-            rules.debug_parse();
-            /*rules.parse();*/
+            //rules.debug_parse();
+            rules.parse();
             jTextArea1.append(lexer.lexicalError);
             jTextArea1.append(tableOfSymbols.bitacora);
             System.out.print(lexer.lexicalError);
@@ -89,7 +89,7 @@ public class Utilities {
         catch (Exception e)
         {
             
-        }                      
+        }                  
     }
     
     public static String constanstDefine(int simpleComma, int doubleComma, String word){

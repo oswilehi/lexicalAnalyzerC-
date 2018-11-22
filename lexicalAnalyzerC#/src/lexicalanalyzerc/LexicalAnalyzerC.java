@@ -48,7 +48,7 @@ public class LexicalAnalyzerC {
             File file = new File(path);
             jflex.Main.generate(file);
             
-            String[] cupCommands = {"-destdir", "C:\\Users\\Oscar\\Google Drive\\Sexto Ciclo\\Compiladores\\Analizador Sintáctico\\lexicalAnalyzerC-\\lexicalAnalyzerC#\\src\\lexicalanalyzerc\\" ,"-parser", "RulesS", path1};
+            String[] cupCommands = {"-destdir", "C:\\Users\\Oscar\\Google Drive\\Sexto Ciclo\\Compiladores\\Analizador Sintáctico\\lexicalAnalyzerC-\\lexicalAnalyzerC#\\src\\lexicalanalyzerc\\" ,"-parser", "RulesSS", path1};
         
             java_cup.Main.main(cupCommands); 
         

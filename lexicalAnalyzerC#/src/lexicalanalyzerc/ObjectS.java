@@ -43,7 +43,4 @@ public class ObjectS {
     {
         return this.ambit;
     }
-    
-    
-    
 }
