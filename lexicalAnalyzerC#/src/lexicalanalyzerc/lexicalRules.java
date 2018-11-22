@@ -1020,7 +1020,7 @@ public String lexeme="";
             }
           case 92: break;
           case 36: 
-            { return new Symbol(sym.booleanConstants, yycolumn, yyline, yytext());
+            { return new Symbol(sym.booleanConstants, yycolumn, yyline, new Boolean(yytext()));
             }
           case 93: break;
           case 37: 

@@ -4,49 +4,60 @@
  * and open the template in the editor.
  */
 package lexicalanalyzerc;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.lang.Object;
+import java.util.*;
 
 /**
  *
  * @author Oscar
  */
 public class tableOfSymbols {
-    HashMap<String, ObjectS> table = new HashMap();
-    
+    ArrayList<ObjectS> table = new ArrayList<ObjectS>();
     /*Ambito al que pertenece*/
-    public int ambit = 0;
+    public String ambit = "";
+    static String bitacora = "";
     
     public tableOfSymbols(){
         System.out.println("Tabla creada " + table.size());
     }
     
-    public ObjectS searchSymbolS(String key){
-        return table.get(key);
+    public void addSymbolS(ObjectS e, LinkedList<String> ambits){
+        if(!searchSymbolS(e, ambits))
+            table.add(e);
     }
     
-    public void addSymbolS(String key, ObjectS object){
-        if (table.get(key) == null)
-            table.put(key, object);
+    public boolean searchSymbolS(ObjectS e, LinkedList<String> ambits){
+        boolean decision = false;
+        for (int j = 0; j < table.size(); j++) {
+            for (int i = ambits.size() - 1; i >= 0; i--) {
+                if (e.name.equals(table.get(j).getName()) && table.get(j).getAmbit().equals(ambits.get(i)))
+                    decision = true;
+            }
+        }
         
+        return decision;
+    }
+    
+    public ObjectS getSymbolS(ObjectS e, LinkedList<String> ambits){
+    ObjectS object = null;        
+        for (int i = 0; i < table.size(); i++) {
+            for (int j = ambits.size()-1; j >= 0; j--) {
+                if (e.name.equals(table.get(i).getName()) && table.get(i).getAmbit().equals(ambits.get(j)))
+                    object = table.get(i);
+            }         
+        }       
+        return object;
+    }
+    
+    public void deleteSymbolS(ObjectS e){
+        for (int i = 0; i < table.size(); i++) {
+            if (e.name.equals(table.get(i).getName()) && e.ambit.equals(table.get(i).getAmbit()))
+                table.remove(i);
+        }
     }
     
     
-    
-    /*Agrego el ambito a la tabla*/
-    public void addAmbitToTable(){
-        table.put("ambit,"+ambit, new ObjectS("","","","ambit",""));
-        System.out.println("nuevo ambito con id: " + ambit);
-    }
-    
-    /*Se creo un ambito nuevo*/
-    public void newAmbit(){
-        ambit++;
-    }
-    
-    public void ambitFinished(){
-        ambit--;
+    public void addToLog(String s){
+        bitacora += s + "\n";
     }
     
     

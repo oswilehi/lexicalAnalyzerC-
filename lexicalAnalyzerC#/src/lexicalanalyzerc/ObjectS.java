@@ -29,6 +29,20 @@ public class ObjectS {
         this.ambit = ambit;
     }
     
+    public ObjectS()
+    {
+        
+    }
+    
+    public String getName()
+    {
+        return this.name;
+    }
+    
+    public String getAmbit()
+    {
+        return this.ambit;
+    }
     
     
     

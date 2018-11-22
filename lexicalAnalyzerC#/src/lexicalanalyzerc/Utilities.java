@@ -69,13 +69,14 @@ public class Utilities {
         Reader targetReader = new FileReader(File);
            
        lexicalRules lexer = new lexicalRules(targetReader);
-       Rules rules = new Rules(lexer);
-        
+       RulesS rules = new RulesS(lexer);
+       
         try
         {
-            //rules.debug_parse();
-            rules.parse();
+            rules.debug_parse();
+            /*rules.parse();*/
             jTextArea1.append(lexer.lexicalError);
+            jTextArea1.append(tableOfSymbols.bitacora);
             System.out.print(lexer.lexicalError);
             
             

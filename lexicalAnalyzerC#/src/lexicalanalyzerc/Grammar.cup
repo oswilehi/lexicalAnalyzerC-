@@ -5,7 +5,7 @@ import java.util.*;
 parser code {:
     
     public String listOfErrors ="";
-    public String bitacora = "";
+    public String bitacora1 = "";
     public void syntax_error(Symbol s){
 		report_error("Error de sintaxis. Línea: " + (s.right + 1) +
 		" Columna: " + (s.left +1) + ". Texto: \"" + s.value + "\"", null);
@@ -21,7 +21,7 @@ parser code {:
 action code {:
       tableOfSymbols table = new tableOfSymbols();
       public String ambit = "";
-      Stack<String> ambits =  new Stack<String>();
+      LinkedList<String> ambits =  new LinkedList<String>();
       boolean isParameter = false;
       String typeStmt = "noName";
 :};
@@ -75,17 +75,17 @@ Variable            ::= Type:t ident:i {:
                         if(ambit.equals(""))
                         {
                               if(isParameter)
-                                    table.addSymbolS(String.valueOf(t)+","+i+","+"global", new ObjectS(i,String.valueOf(t),val,"Parametro","global")); 
+                                    table.addSymbolS(new ObjectS(i,String.valueOf(t),val,"Parametro","global"), ambits); 
                               else
-                                    table.addSymbolS(String.valueOf(t)+","+i+","+"global", new ObjectS(i,String.valueOf(t),val,"Variable","global"));       
+                                    table.addSymbolS(new ObjectS(i,String.valueOf(t),val,"Variable","global"), ambits);       
                         }
                               
                         else
                         {
                               if(isParameter)
-                                    table.addSymbolS(String.valueOf(t)+","+i+","+ambit, new ObjectS(i,String.valueOf(t),val,"Parametro",ambit));
+                                    table.addSymbolS(new ObjectS(i,String.valueOf(t),val,"Parametro",ambit), ambits);
                               else
-                                    table.addSymbolS(String.valueOf(t)+","+i+","+ambit, new ObjectS(i,String.valueOf(t),val,"Variable",ambit));
+                                    table.addSymbolS(new ObjectS(i,String.valueOf(t),val,"Variable",ambit), ambits);
                         }
                               
 
@@ -98,12 +98,18 @@ Type                ::= intConstantType:t {:RESULT = t;:}
                     | ident:t {:RESULT = t;:}
                     | Type BRACKETS;
 FunctionDecl        ::= Type:t ident:i {:
-                         table.addSymbolS(String.valueOf(t)+","+i+","+ambit, new ObjectS(i,String.valueOf(t),"","Funcion",ambit));
-                         ambit = i;
-                         ambits.push(ambit);
+                        if(ambit.equals(""))
+                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Funcion","global"), ambits);
+                        else
+                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Funcion",ambit), ambits);     
+                        ambit = i;
+                        ambits.push(ambit);
                         :}lParenthesis {:isParameter = true;:} Formals rParenthesis {:isParameter = false;:} StmtBlock
                     | VOID:t ident:i {:
-                        table.addSymbolS(String.valueOf(t)+","+i+","+ambit, new ObjectS(i,String.valueOf(t),"","VOID",ambit));
+                        if(ambit.equals(""))
+                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","VOID","global"), ambits);
+                        else
+                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","VOID",ambit), ambits);
                         ambit = i;
                         ambits.push(ambit);
                         :} lParenthesis {:isParameter = true;:}  Formals {:isParameter = false;:} rParenthesis StmtBlock;
@@ -111,12 +117,15 @@ Formals             ::= Variable FormalsLR |;
 FormalsLR           ::= comma Variable FormalsLR
                     |;
 ClassDecl           ::= CLASS:t ident:i {:
-                         table.addSymbolS(String.valueOf(t)+","+i+","+ambit, new ObjectS(i,String.valueOf(t),"","Clase",ambit));
+                        if(ambit.equals(""))
+                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Clase","global"), ambits);
+                        else
+                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Clase",ambit), ambits);
                          ambit = i;
                          ambits.push(ambit);
                         :} ClassOptional ClassOptional2 lBrace ClassClosing rBrace {:
                                                                                     ambits.pop();/*ambits.push("fin"+ambit);*/
-                                                                                    if(!ambits.empty())
+                                                                                    if(!ambits.isEmpty())
                                                                                     {
                                                                                           ambit = ambits.peek();
                                                                                     }
@@ -135,12 +144,15 @@ ClassClosing        ::= Field ClassClosing
 Field               ::= VariableDecl
                     | FunctionDecl;
 InterfaceDecl       ::= INTERFACE:t ident:i {:
-                        table.addSymbolS(String.valueOf(t)+","+i+","+ambit, new ObjectS(i,String.valueOf(t),"","Inteface",ambit));
+                        if(ambit.equals(""))
+                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Inteface","global"), ambits);
+                        else
+                              table.addSymbolS(new ObjectS(i,String.valueOf(t),"","Inteface",ambit), ambits);
                         ambit = i;
                         ambits.push(ambit);
                         :} lBrace InterfaceClosing rBrace {:
                                                             ambits.pop();/*ambits.push("fin"+ambit);*/
-                                                            if(!ambits.empty())
+                                                            if(!ambits.isEmpty())
                                                                {
                                                                   
                                                                   ambit = ambits.peek();
@@ -153,9 +165,9 @@ InterfaceClosing    ::= Prototype InterfaceClosing
                     |;
 Prototype           ::= Type ident lParenthesis Formals rParenthesis semicolon
                     | VOID  ident   lParenthesis Formals rParenthesis semicolon;
-StmtBlock           ::= lBrace VariableDeclClosing StmtClosing rBrace {:
+StmtBlock           ::= lBrace {:ambits.push(ambit);:} VariableDeclClosing StmtClosing rBrace {:
                                                                         ambits.pop();/*ambits.push("fin"+ambit);*/
-                                                                        if(!ambits.empty())
+                                                                        if(!ambits.isEmpty())
                                                                            {
                                                                              
                                                                              ambit = ambits.peek();
@@ -169,9 +181,9 @@ VariableDeclClosing ::= VariableDeclClosing VariableDecl
 StmtClosing         ::= Stmt StmtClosing
                     |;
 Stmt                ::= ExprOptional semicolon
-                    | IfStmt {:ambit = "if"; ambits.push(ambit);:}
-                    | WhileStmt {:ambit = "while"; ambits.push(ambit);:}
-                    | ForStmt {:ambit = "for"; ambits.push(ambit);:}
+                    | IfStmt {:ambit = "if";:}
+                    | WhileStmt {:ambit = "while";:}
+                    | ForStmt {:ambit = "for";:}
                     | BreakStmt 
                     | ReturnStmt 
                     | PrintStmt
@@ -188,10 +200,17 @@ BreakStmt           ::= BREAK semicolon;
 PrintStmt           ::= PRINT lParenthesis Expr ExprLR rParenthesis semicolon;
 ExprLR              ::= comma Expr ExprLR
                     |;
-Expr                ::= LValue EQUAL Expr:e1 {:RESULT = e1;
-                                                /*System.out.println(e1);*/:}
+Expr                ::= LValue:i EQUAL Expr:e {:RESULT = e;
+                                                ObjectS aux = new ObjectS();
+                                                aux.name = String.valueOf(i);
+                                                ObjectS aux1 = new ObjectS();
+                                                aux1 = table.getSymbolS(aux, ambits);
+                                                aux1.val = String.valueOf(RESULT);
+                                                table.addSymbolS(aux1, ambits);
+                                                table.addToLog("Se asigno el valor " + aux1.val + " a la " + aux1.objectType + " " + aux1.name + " de tipo " + aux1.type);
+                                               System.out.println(String.valueOf(i) + "= " + String.valueOf(RESULT));:}
                     | Constant:c {:RESULT = c;:}
-                    | LValue
+                    | LValue:a {:RESULT = a;:}
                     | THIS
                     | Call
                     | lParenthesis Expr rParenthesis
